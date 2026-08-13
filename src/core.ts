@@ -1,0 +1,98 @@
+export interface VoidAuthConfig {
+  issuer: string
+  clientId: string
+  redirectUri: string
+  scopes?: string[]
+}
+
+export interface OAuthTokens {
+  accessToken: string
+  refreshToken?: string
+  idToken?: string
+  expiresIn?: number
+  scope?: string
+}
+
+export interface OIDCUser {
+  sub?: string
+  name?: string
+  preferred_username?: string
+  email?: string
+  email_verified?: boolean
+  updated_at?: number
+  [key: string]: any
+}
+
+export interface OIDCDiscovery {
+  issuer: string
+  authorization_endpoint: string
+  token_endpoint: string
+  userinfo_endpoint: string
+  jwks_uri: string
+  revocation_endpoint?: string
+  scopes_supported: string[]
+  response_types_supported: string[]
+  code_challenge_methods_supported: string[]
+  claims_supported: string[]
+}
+
+const DISCOVERY_CACHE = new Map<string, OIDCDiscovery>()
+
+export async function fetchDiscovery(issuer: string): Promise<OIDCDiscovery> {
+  const cached = DISCOVERY_CACHE.get(issuer)
+  if (cached) return cached
+
+  const url = issuer.replace(/\/$/, '') + '/.well-known/openid-configuration'
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Failed to fetch OIDC discovery: ${res.status}`)
+  const doc = await res.json()
+  DISCOVERY_CACHE.set(issuer, doc)
+  return doc
+}
+
+export function base64url(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer)
+  let binary = ''
+  for (const b of bytes) binary += String.fromCharCode(b)
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+export function generateCodeVerifier(): string {
+  const array = new Uint8Array(32)
+  crypto.getRandomValues(array)
+  return base64url(array.buffer)
+}
+
+export async function generateCodeChallenge(verifier: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(verifier)
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  return base64url(digest)
+}
+
+export function generateState(): string {
+  const array = new Uint8Array(16)
+  crypto.getRandomValues(array)
+  return base64url(array.buffer)
+}
+
+export function decodeJwtPayload(token: string): OIDCUser {
+  const parts = token.split('.')
+  if (parts.length < 2) throw new Error('Invalid JWT')
+  const payload = parts[1]
+  const decoded = payload.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = decoded + '='.repeat((4 - (decoded.length % 4)) % 4)
+  return JSON.parse(atob(padded))
+}
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const payload = decodeJwtPayload(token)
+    if (!payload.exp) return false
+    return Date.now() >= payload.exp * 1000
+  } catch {
+    return true
+  }
+}
+
+export const DEFAULT_SCOPES = ['openid', 'profile', 'email']
