@@ -51,7 +51,7 @@ const voidauth = new VoidAuthClient({
   clientId: 'your-client-id',
   clientSecret: 'your-client-secret',
   redirectUri: 'http://localhost:3000/callback',
-  sessionSecret: process.env.SESSION_SECRET!, // used to encrypt the session cookie
+  sessionSecret: process.env.SESSION_SECRET, // optional — ephemeral if omitted
   cookieSecure: process.env.NODE_ENV === 'production',
 })
 
@@ -84,6 +84,8 @@ app.get('/logout', (_req, res) => {
   res.setHeader('set-cookie', voidauth.destroySession())
   res.redirect('/')
 })
+
+app.listen(3000, () => console.log('Listening on http://localhost:3000'))
 ```
 
 Lower-level `VoidAuthServer` is still available if you prefer to manage the session yourself:

@@ -179,7 +179,7 @@ export class VoidAuthServer {
 
 export interface VoidAuthClientConfig extends VoidAuthConfig {
   clientSecret: string
-  sessionSecret: string
+  sessionSecret?: string
   cookieName?: string
   cookieSecure?: boolean
   cookieMaxAge?: number
@@ -248,10 +248,19 @@ export class VoidAuthClient extends VoidAuthServer {
 
   constructor(config: VoidAuthClientConfig) {
     super(config)
-    if (!config.sessionSecret || config.sessionSecret.length < 16) {
+    if (config.sessionSecret && config.sessionSecret.length < 16) {
       throw new Error('sessionSecret must be at least 16 characters')
     }
-    this.sessionSecret = config.sessionSecret
+    if (!config.sessionSecret) {
+      this.sessionSecret = randomBytes(32).toString('hex')
+      console.warn(
+        '[voidauth] No sessionSecret provided — generating an ephemeral one. ' +
+        'Sessions will not survive a server restart. Set sessionSecret ' +
+        '(at least 16 chars) for persistent sessions.'
+      )
+    } else {
+      this.sessionSecret = config.sessionSecret
+    }
     this.cookieName = config.cookieName || 'va_session'
     this.cookieSecure = config.cookieSecure ?? false
     this.cookieMaxAge = config.cookieMaxAge || 60 * 60 * 24

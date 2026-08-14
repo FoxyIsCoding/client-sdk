@@ -26,7 +26,7 @@ export declare class VoidAuthServer {
 }
 export interface VoidAuthClientConfig extends VoidAuthConfig {
     clientSecret: string;
-    sessionSecret: string;
+    sessionSecret?: string;
     cookieName?: string;
     cookieSecure?: boolean;
     cookieMaxAge?: number;
