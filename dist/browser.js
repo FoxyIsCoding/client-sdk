@@ -132,6 +132,20 @@ export class VoidAuth {
     isAuthenticated() {
         return this.getToken() !== null;
     }
+    async validateSession() {
+        if (!this.tokens?.accessToken)
+            return false;
+        try {
+            await this.fetchUserinfo(this.tokens.accessToken);
+            return true;
+        }
+        catch {
+            this.tokens = null;
+            this.user = null;
+            sessionStorage.removeItem(STORAGE_KEY);
+            return false;
+        }
+    }
     async refresh() {
         if (!this.tokens?.refreshToken)
             throw new Error('No refresh token available');

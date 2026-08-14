@@ -221,6 +221,12 @@ export class VoidAuthClient extends VoidAuthServer {
         try {
             const data = decrypt(this.sessionSecret, raw);
             if (data?.tokens?.accessToken) {
+                try {
+                    await this.getUserInfo(data.tokens.accessToken);
+                }
+                catch {
+                    return null;
+                }
                 return data;
             }
             return null;

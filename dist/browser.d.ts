@@ -15,6 +15,7 @@ export declare class VoidAuth {
     getUser(): OIDCUser | null;
     getToken(): string | null;
     isAuthenticated(): boolean;
+    validateSession(): Promise<boolean>;
     refresh(): Promise<OAuthTokens>;
     logout(): Promise<void>;
 }

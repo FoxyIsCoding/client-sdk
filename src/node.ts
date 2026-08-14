@@ -304,6 +304,11 @@ export class VoidAuthClient extends VoidAuthServer {
         user: OIDCUser
       }
       if (data?.tokens?.accessToken) {
+        try {
+          await this.getUserInfo(data.tokens.accessToken)
+        } catch {
+          return null
+        }
         return data as VoidAuthSession
       }
       return null

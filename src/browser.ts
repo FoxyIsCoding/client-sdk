@@ -157,6 +157,19 @@ export class VoidAuth {
     return this.getToken() !== null
   }
 
+  async validateSession(): Promise<boolean> {
+    if (!this.tokens?.accessToken) return false
+    try {
+      await this.fetchUserinfo(this.tokens.accessToken)
+      return true
+    } catch {
+      this.tokens = null
+      this.user = null
+      sessionStorage.removeItem(STORAGE_KEY)
+      return false
+    }
+  }
+
   async refresh(): Promise<OAuthTokens> {
     if (!this.tokens?.refreshToken) throw new Error('No refresh token available')
 
