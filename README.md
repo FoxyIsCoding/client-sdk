@@ -1,44 +1,22 @@
-# @voidauth/client
 
-VoidAuth OIDC client for browser and Node.js. Supports PKCE, token exchange, user info, and the VoidAuth Storage API.
-
-## Install
+<div align="center">
+  
+## - client-sdk -
+an sdk for VoidAuth oauth login and OIDC client.
+<br>
+<br>
 
 ```bash
 npm install @voidauth/client
 ```
 
-## Browser (PKCE)
 
-```typescript
-import { VoidAuth } from '@voidauth/client/browser'
+## Usage:
+this package has currently 2 options on how to use it.. Either Browser (PKCE) or Node.js
+<br>
 
-const auth = new VoidAuth({
-  issuer: 'https://auth.stwupid.tech',
-  clientId: 'your-client-id',
-  redirectUri: 'http://localhost:3000/callback',
-  scopes: ['openid', 'profile', 'email'],
-})
-
-// Start login (redirects to authorize)
-await auth.login()
-
-// After redirect back, exchange code
-const { user, tokens } = await auth.handleCallback()
-console.log('Logged in:', user.name)
-
-// Check auth
-if (auth.isAuthenticated()) {
-  const token = auth.getToken()
-}
-
-// Logout
-await auth.logout()
-```
-
-## Node.js (Express)
-
-The `VoidAuthClient` class handles the full OAuth flow — login redirect, callback exchange, and an encrypted session cookie — so no cookie-parser or manual session wiring is needed.
+#### node.js (express) example:
+*the `VoidAuthClient` class handles the OAuth flow unlike the server which handles sessions itself.*
 
 ```typescript
 import express from 'express'
@@ -88,7 +66,7 @@ app.get('/logout', (_req, res) => {
 app.listen(3000, () => console.log('Listening on http://localhost:3000'))
 ```
 
-Lower-level `VoidAuthServer` is still available if you prefer to manage the session yourself:
+lower-level `VoidAuthServer` is still available if you prefer to manage the session yourself:
 
 ```typescript
 import { VoidAuthServer } from '@voidauth/client/node'
@@ -115,22 +93,12 @@ await auth.revokeToken(tokens.refreshToken)
 // Verify ID token (claims: iss, aud, exp, nbf)
 const claims = await auth.verifyIdToken(tokens.idToken!)
 ```
+---
 
-## API Reference
+### API Reference:
 
-### VoidAuth (Browser)
 
-| Method | Returns | Description |
-|---|---|---|
-| `login(returnTo?)` | `Promise<void>` | Redirect to authorize endpoint |
-| `handleCallback()` | `Promise<{user, tokens}>` | Exchange code for tokens |
-| `isAuthenticated()` | `boolean` | Check if logged in |
-| `getToken()` | `string \| null` | Get access token |
-| `getUser()` | `OIDCUser \| null` | Get current user |
-| `refresh()` | `Promise<OAuthTokens>` | Refresh access token |
-| `logout()` | `Promise<void>` | Clear tokens |
-
-### VoidAuthServer (Node.js)
+#### VoidAuthServer (Node.js)
 
 | Method | Returns | Description |
 |---|---|---|
@@ -140,7 +108,7 @@ const claims = await auth.verifyIdToken(tokens.idToken!)
 | `revokeToken(token)` | `Promise<void>` | Revoke token |
 | `verifyIdToken(idToken)` | `Promise<OIDCUser>` | Verify ID token |
 
-### VoidAuthClient (Node.js, session-aware)
+#### VoidAuthClient (Node.js, session-aware)
 
 | Method | Returns | Description |
 |---|---|---|
@@ -150,6 +118,7 @@ const claims = await auth.verifyIdToken(tokens.idToken!)
 | `requireSession(cookieHeader?)` | `Promise<VoidAuthSession>` | Throws if no valid session |
 | `destroySession()` | `string` | Session-clearing Set-Cookie header |
 
-## License
+#### - <img src="https://wsrv.nl/?url=https://raw.githubusercontent.com/voidsuite/.github/refs/heads/main/logo.png&w=40"  align="center"/> -
 
-MIT
+</div>
+
