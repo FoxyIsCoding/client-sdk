@@ -1,7 +1,7 @@
 {
   "name": "@voidauth/client",
-  "version": "1.0.3",
-  "description": "VoidAuth OIDC client for browser and Node.js — PKCE, tokens, user info, storage API",
+  "version": "1.0.4",
+  "description": "an client-sdk for integrating VoidAuth easily in your apps using Node.js",
   "type": "module",
   "main": "./dist/core.js",
   "types": "./dist/core.d.ts",
@@ -44,6 +44,10 @@
   "license": "MIT",
   "engines": {
     "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voidsuite/client-sdk.git"
   },
   "dependencies": {},
   "devDependencies": {
